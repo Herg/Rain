@@ -18,16 +18,11 @@ class forecast_service(object):
 
 
     def get_daily_forecast(self, lat = None, long = None):
-        if lat is not None:
-            self.lat = lat
-        if long is not None:
-            self.long = long
-        url = '%s%s,%s?units=%s' % (self.base_url, self.lat, self.long, DEFAULT_UNITS)
+        data = self._make_request(lat, long)
         try:
-            data = json.load(urllib2.urlopen(url))
             daily_data = data['daily']['data']
         except:
-            return None
+            return {}
         forecast = []
         for day in daily_data:
             day_data = {}
@@ -49,6 +44,32 @@ class forecast_service(object):
         return { 'data' : forecast }
 
 
-fs = forecast_service()
-w = fs.get_daily_forecast()
-pprint.pprint(w)
+    def get_todays_forecast(self, lat = None, long = None):
+        data = self._make_request(lat, long)
+        forecast = []
+        try:
+            hourly_data = data['hourly']['data']
+            for hour in hourly_data:
+                hour_data = {}
+                hour_data['temperature'] = hour['temperature']
+                hour_data['summary'] = hour['summary']
+                hour_data['precip_intensity'] = hour['precipIntensity']
+                hour_data['time'] = hour['time']
+                forecast.append(hour_data)
+            return forecast
+        except:
+            return {}
+    
+
+    def _make_request(self, lat = None, long = None):
+        if lat is not None:
+            self.lat = lat
+        if long is not None:
+            self.long = long
+        url = '%s%s,%s?units=%s' % (self.base_url, self.lat, self.long, DEFAULT_UNITS)
+        try:
+            data = json.load(urllib2.urlopen(url))
+            return data
+        except:
+            return None
+
