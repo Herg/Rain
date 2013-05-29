@@ -1,4 +1,5 @@
 
+
 import pprint
 import urllib2
 import json
@@ -34,7 +35,7 @@ class forecast_service(object):
             day_data['temp_max'] = day['temperatureMax']
             day_data['temp_mix'] = day['temperatureMin']
             day_data['summary'] = day['summary']
-            if day['precipIntensity'] > 0.0:
+            if day['precipIntensity'] > 0.0 and 'precipType' in day:
                 day_data['precip_type'] = day['precipType']
                 if day['precipIntensity'] < 0.17:
                     day_data['precip_intensity'] = 'sprinkling'
